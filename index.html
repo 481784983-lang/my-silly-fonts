@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>konata-ui.js 测试页</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background:#f0f0f0; }
+    .chat { max-width: 720px; margin: 0 auto; }
+    .mes { background: #fff; padding: 10px; margin: 10px 0; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h2>konata-ui.js 本地测试</h2>
+  <div class="chat" id="chat">
+    <!-- 示例消息：符合脚本匹配格式 [角色名] 文本 -->
+    <div class="mes"><div class="mes_text">[诸葛亮] 这是一个测试消息，显示头像和红金样式。</div></div>
+    <div class="mes"><div class="mes_text">[我] 玩家说：你好！</div></div>
+  </div>
+
+  <script type="module">
+    // 请确保 konata-ui.js 与 index.html 在同一目录，或调整相对路径
+    import { init } from './konata-ui.js';
+
+    // 调用库的初始化函数
+    init();
+
+    // 动态添加新消息以测试 MutationObserver
+    setTimeout(() => {
+      const chat = document.getElementById('chat');
+      const newMes = document.createElement('div');
+      newMes.className = 'mes';
+      const inner = document.createElement('div');
+      inner.className = 'mes_text';
+      inner.innerText = '[关云] 动态添加的消息，用来测试自动渲染。';
+      newMes.appendChild(inner);
+      chat.appendChild(newMes);
+    }, 1500);
+  </script>
+</body>
+</html>
