@@ -1,0 +1,7 @@
+{
+  "name": "Konata RedGold Dialogue UI",
+  "author": "Konata x GPT-5",
+  "version": "1.0.0",
+  "description": "为三国角色提供红金主题头像对话UI，自动解析 [角色名] 格式。",
+  "js": ["konata-ui.js"]
+}
