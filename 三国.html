@@ -1,0 +1,588 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Merriweather:ital,wght@0,400;1,400&family=Noto+Sans+SC:wght@400;500;700&family=Almendra+SC&family=Cinzel+Decorative:wght@700&family=EB+Garamond&family=Josefin+Sans&family=Playfair+Display&family=Roboto+Slab&family=Spectral&display=swap" rel="stylesheet">
+
+<style>
+    /* --- [ 1. 卷轴 UI CSS (v18.2) ] --- */
+    
+    #chessboard-container-wrapper {
+        font-family: 'Noto Sans SC', 'Merriweather', serif; 
+        color: #e0e0e0; 
+    }
+    .hidden { display: none !important; }
+
+    /* [新] 统一卷轴容器 */
+    #chessboard-container-wrapper {
+        max-width: 1000px; /* 卷轴最大宽度 */
+        min-height: 800px; /* 卷轴最小高度 */
+        margin: 15px auto; 
+        padding: 60px 140px; 
+        box-sizing: border-box; 
+        
+        background-color: #f5eeda; 
+        background-image: url('https://raw.githubusercontent.com/481784983-lang/my-silly-fonts/main/ChatGPT%20Image%202025%E5%B9%B411%E6%9C%884%E6%97%A5%2021_47_32.png'); 
+        background-size: 100% 100%; 
+        background-repeat: no-repeat;
+        
+        font-family: 'EB Garamond', 'Noto Sans SC', serif; 
+        color: #4a3b2a; 
+        
+        transition: all 0.8s ease;
+        border-radius: 12px; 
+    }
+
+    #chessboard-container-wrapper div, #chessboard-container-wrapper p, #chessboard-container-wrapper span, 
+    #chessboard-container-wrapper summary, #chessboard-container-wrapper details {
+        font-family: inherit;
+        color: #4a3b2a; 
+    }
+    .value-main { font-weight: 500; color: #3a2c1a; }
+    .property-name { font-weight: bold; color: #6a4f3a; }
+    .empty-state-text { color: #6a4f3a; font-style: italic; opacity: 0.8; }
+
+    /* [!] 主题定义 (v18.2) */
+    
+    #chessboard-container-wrapper.theme-imperial { 
+        --theme-accent-glow: #a8904a; 
+        --theme-font-title: 'Cinzel Decorative', serif;
+        --theme-font-header: 'Playfair Display', serif;
+        font-family: 'Playfair Display', serif; 
+        animation: regal-pulse-imperial 8s infinite ease-in-out;
+    }
+    
+    #chessboard-container-wrapper.theme-elven { 
+        --theme-accent-glow: #00ff7f; 
+        --theme-font-title: 'Josefin Sans', sans-serif;
+        --theme-font-header: 'EB Garamond', serif;
+        font-family: 'EB Garamond', serif; 
+        animation: shimmer-glow-elven 6s infinite ease-in-out; 
+    }
+    
+    #chessboard-container-wrapper.theme-draconic { 
+        --theme-accent-glow: #D4AF37; 
+        --theme-accent-main: #8b0000; 
+        --theme-font-title: 'Almendra SC', serif;
+        --theme-font-header: 'Cinzel', serif;
+        font-family: 'Cinzel Decorative', cursive; 
+        animation: pulse-glow-draconic 4s infinite ease-in-out;
+    }
+    #chessboard-container-wrapper.theme-draconic .master-ui-title h1 { color: var(--theme-accent-main, #8b0000); }
+    #chessboard-container-wrapper.theme-draconic .scroll-header { border-bottom-color: var(--theme-accent-main, #8b0000); }
+    
+    #chessboard-container-wrapper.theme-abyss { 
+        --theme-accent-glow: #8a2be2;
+        --theme-accent-main: #4b0082;
+        --theme-font-title: 'Cinzel Decorative', serif;
+        --theme-font-header: 'Spectral', serif;
+        font-family: 'Almendra SC', serif; 
+        animation: pulse-glow-abyss 4s infinite ease-in-out; 
+    }
+    #chessboard-container-wrapper.theme-abyss .master-ui-title h1 { color: var(--theme-accent-main, #4b0082); }
+    #chessboard-container-wrapper.theme-abyss .scroll-header { border-bottom-color: var(--theme-accent-main, #4b0082); }
+
+    @keyframes regal-pulse-imperial {
+        0%, 100% { box-shadow: 0 0 20px #a8904a; }
+        50% { box-shadow: 0 0 35px #a8904a; }
+    }
+    @keyframes shimmer-glow-elven {
+        0%, 100% { box-shadow: 0 0 25px rgba(0, 255, 127, 0.4); }
+        50% { box-shadow: 0 0 35px rgba(0, 255, 127, 0.6); }
+    }
+    @keyframes pulse-glow-draconic {
+        0%, 100% { box-shadow: 0 0 20px #8b0000, 0 0 30px #6a0000; }
+        50% { box-shadow: 0 0 35px #c0392b, 0 0 45px #8b0000; }
+    }
+    @keyframes pulse-glow-abyss { 
+        0%, 100% { box-shadow: 0 0 25px #8a2be2, 0 0 35px #4b0082; } 
+        50% { box-shadow: 0 0 40px #9400d3, 0 0 55px #4b0082; } 
+    }
+
+    .scroll-header {
+        display: flex;
+        justify-content: space-between; 
+        align-items: flex-start;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #8a6f4a; 
+        margin-bottom: 20px;
+    }
+
+    .master-ui-title h1 {
+        font-family: var(--theme-font-title, 'Cinzel Decorative', serif); 
+        font-size: 2.8em; font-weight: 700; margin: 0; color: #594228;
+        text-shadow: 0 0 8px var(--theme-accent-glow, #a8904a), 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .master-ui-title { padding: 0; }
+
+    .scroll-poem-container h1 {
+        font-family: var(--theme-font-title, 'Cinzel Decorative', serif); 
+        font-size: 1.8em; 
+        color: #594228;
+        text-shadow: 0 0 8px var(--theme-accent-glow, #a8904a), 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .scroll-poem-container { text-align: right; }
+    
+    .poem-grid {
+        display: grid; grid-template-columns: auto auto; 
+        gap: 5px 20px; padding: 10px 0;
+        font-family: 'Noto Sans SC', serif; 
+        font-size: 1.0em; 
+        color: #6a4f3a;
+        text-align: right; 
+    }
+    .poem-grid p { margin: 0; }
+
+    .blocks-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr; 
+        grid-template-rows: auto auto;    
+        gap: 20px; 
+    }
+
+    details.section {
+        margin: 0; 
+        border: 1px solid #c9b89a; 
+        border-radius: 6px;
+        background: #fdfaf2; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    details.section > summary {
+        background-color: #f8f3e8; 
+        border-bottom: 1px solid #c9b89a;
+        font-family: var(--theme-font-header, 'Cinzel', serif);
+        color: #594228;
+        font-weight: 700;
+        padding: 12px 15px;
+        display: flex; justify-content: space-between; align-items: center; list-style: none; cursor: pointer; transition: all 0.2s ease;
+    }
+    details.section > summary:hover { background: #f0e9d9; }
+    details > summary::-webkit-details-marker { display: none; }
+    details > summary .summary-icon { margin-right: 10px; opacity: 0.8; }
+    .arrow-toggle { transition: transform 0.3s ease; margin-left: auto;}
+    details[open] > summary .arrow-toggle { transform: rotate(90deg); }
+
+    .section-content {
+        background-color: transparent; 
+        padding: 15px;
+        min-height: 250px; 
+        max-height: 350px; 
+        overflow-y: auto;  
+        border-top: none;
+    }
+    details.sub-section { 
+        background: #fAf6ed; 
+        border-color: #c9b89a;
+    }
+    details.sub-section > summary { background-color: rgba(0,0,0,0.05); }
+    .sub-section-content { background-color: transparent; }
+
+    hr { border: 0; height: 1px; background-image: linear-gradient(to right, transparent, rgba(74,59,42,0.3), transparent); margin: 15px 0; }
+
+    .world-info-box { background-color: #fdfaf2; padding: 12px 18px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #c9b89a; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px; align-items: center; }
+    .char-property-grid .char-icon { opacity: 0.8; color: #6a4f3a; }
+    .item-row { border-bottom: 1px solid rgba(74,59,42,0.1); }
+    .char-favor-bar-container { background-color: rgba(0,0,0,0.1); border-color: #c9b89a; }
+
+    /* --- [ 战斗 UI 已删除 ] --- */
+
+</style>
+
+<div id="chessboard-container-wrapper">
+    <p style="color: #a0a0a0; font-style: italic; text-align: center; padding: 20px;">
+        正在加载“无双志”...
+    </p>
+</div>
+
+<script>
+    (function() {
+        if (window.MASTER_UI_INITIALIZED) return;
+        window.MASTER_UI_INITIALIZED = true;
+        console.log("--- [天下为棋 Master UI v18.3 卷轴重构] 脚本初始化 ---"); 
+
+        // --- [ 1. GLOBAL HELPERS ] ---
+        window.last_stat_data = {}; 
+
+        const isObject = (item) => (item && typeof item === 'object' && !Array.isArray(item));
+        const setToggle = (id, visible) => {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden', !visible);
+        };
+        const deepMerge = (target, source) => {
+            let output = Object.assign({}, target);
+            if (isObject(target) && isObject(source)) {
+                Object.keys(source).forEach(key => {
+                    if (key === '$meta') return;
+                    if (isObject(source[key])) {
+                        if (!(key in target) || !isObject(target[key])) { Object.assign(output, { [key]: source[key] }); } 
+                        else { output[key] = deepMerge(target[key], source[key]); }
+                    } else { Object.assign(output, { [key]: source[key] }); }
+                });
+            }
+            return output;
+        };
+        const SafeGetValue = (obj, path, defaultValue) => {
+            try {
+                const keys = path.split('.');
+                let current = obj;
+                for (let i = 0; i < keys.length; i++) {
+                    const key = keys[i];
+                    if (current === null || typeof current !== 'object') { return defaultValue; }
+                    const match = key.match(/^(.+?)\[(\d+)\]$/);
+                    if (match) {
+                        const arrayKey = match[1];
+                        const index = parseInt(match[2], 10);
+                        if (current.hasOwnProperty(arrayKey) && Array.isArray(current[arrayKey]) && index >= 0 && index < current[arrayKey].length) {
+                            current = current[arrayKey][index];
+                        } else { return defaultValue; }
+                    } else if (current.hasOwnProperty(key)) {
+                        current = current[key];
+                    } else { return defaultValue; }
+                }
+                return current === undefined ? defaultValue : current;
+            } catch (error) {
+                console.error(`SafeGetValue CRITICAL ERROR for path \"${path}\" in obj:`, obj, 'Error:', error);
+                return defaultValue;
+            }
+        };
+        
+        // [!] 默认状态 (使用单引号 ' 保证JS在任何环境下的兼容性)
+        const defaultMasterEmptyState = {
+            'UI状态': { '当前界面': ['日常', ''] },
+            '世界': { '时间': ['（暂无）', ''], '地点': ['（暂无）', ''] },
+            '主角': { '势力': ['群雄', ''], '声望': ['无名之辈', ''], '命': [1000, ''], '法': [1000, ''], '武力': [0, ''], '谋略': [0, ''], '魅力': [0, ''], '官职': ['无', ''], '血脉': ['凡人', ''], '仙术': [ { '$meta': { 'extensible': true } } ] },
+            '行囊': { 
+                '装备': { '武器': ['无', ''], '防具': ['无', ''], '饰品': ['无', ''] }, 
+                '背包': [ { '$meta': { 'extensible': true } } ] 
+            },
+            '结缘录': [ { '$meta': { 'extensible': true } } ],
+            '天下闻': { '奇闻': ['（暂无奇闻）', ''], '当前剧情': ['（等待开局...）', ''], '咏叹': ['（暂无诗篇）', ''] }
+        };
+
+        // --- [ 2. MVU 交互助手 ] --- 
+        window.SillyTavern_MVU_Set = (path, old_val, new_val, comment = "UI: Set") => {
+            if (typeof Mvu === 'undefined') return console.error("[MasterUI] Mvu not found!");
+            Mvu.setVariable(path, old_val, new_val, comment);
+        };
+        window.SillyTavern_TriggerSlash = (command) => {
+            if (typeof triggerSlash === 'function') {
+                console.log(`[MasterUI] Triggering Slash: ${command}`);
+                triggerSlash(command);
+            } else {
+                console.error('triggerSlash function not found. Command:', command);
+                alert(`Error: triggerSlash function not found. Cannot send command:\n${command}`);
+            }
+        };
+
+        // --- [ 3. 日常 UI 渲染器 (v18) ] ---
+        
+        const emptyIcon = `<p class=\"empty-state-text\">(空)</p>`;
+        const emptyVal = "---";
+        
+        const daily_updateProgressBar = (barId, current, max) => {
+            const bar = document.getElementById(barId);
+            if (bar) {
+                const percentage = max > 0 ? (current / max) * 100 : 0;
+                bar.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
+            }
+        };
+        
+        function populateWorldInfo(worldData) {
+            return `
+            <div class="world-info-box">
+                <p><i class="fa-solid fa-clock"></i> <span class="property-name">时间:</span> <span class="value-main">${SafeGetValue(worldData, '时间[0]', emptyVal)}</span></p>
+                <p><i class="fa-solid fa-map-location-dot"></i> <span class="property-name">地点:</span> <span class="value-main">${SafeGetValue(worldData, '地点[0]', emptyVal)}</span></p>
+            </div>`;
+        }
+
+        function populateProtagonist(protagonistData) {
+            const statIcons = { '声望': 'fa-star-half-alt', '官职': 'fa-scroll', '血脉': 'fa-dna', '武力': 'fa-gavel', '谋略': 'fa-brain', '魅力': 'fa-heart-circle-bolt' };
+            const statsHtml = `
+                <div class="char-property-grid">
+                    <i class="fa-solid ${statIcons['声望']} char-icon"></i><span class="char-prop-name">声望</span><span class="char-prop-value">${SafeGetValue(protagonistData, '声望[0]', emptyVal)}</span>
+                    <i class="fa-solid ${statIcons['官职']} char-icon"></i><span class="char-prop-name">官职</span><span class="char-prop-value">${SafeGetValue(protagonistData, '官职[0]', emptyVal)}</span>
+                    <i class="fa-solid ${statIcons['血脉']} char-icon"></i><span class="char-prop-name">血脉</span><span class="char-prop-value">${SafeGetValue(protagonistData, '血脉[0]', emptyVal)}</span>
+                    <i class="fa-solid ${statIcons['武力']} char-icon"></i><span class="char-prop-name">武力</span><span class="char-prop-value">${SafeGetValue(protagonistData, '武力[0]', 0)}</span>
+                    <i class="fa-solid ${statIcons['谋略']} char-icon"></i><span class="char-prop-name">谋略</span><span class="char-prop-value">${SafeGetValue(protagonistData, '谋略[0]', 0)}</span>
+                    <i class="fa-solid ${statIcons['魅力']} char-icon"></i><span class="char-prop-name">魅力</span><span class="char-prop-value">${SafeGetValue(protagonistData, '魅力[0]', 0)}</span>
+                </div>`;
+
+            const skills = SafeGetValue(protagonistData, '仙术[0]', {});
+            const skillKeys = typeof skills === 'object' && skills !== null ? Object.keys(skills).filter(k => k !== '$meta' && k !== '__description') : [];
+            let skillsHtml = '';
+            if (skillKeys.length > 0) {
+                skillsHtml = skillKeys.map(key => {
+                    const skill = skills[key];
+                    if (typeof skill !== 'object' || skill === null) return '';
+                    return `<details class=\"sub-section\">
+                            <summary>${SafeGetValue(skill, '名称[0]', key)}<span class=\"arrow-toggle\">&gt;</span></summary>
+                            <div class=\"sub-section-content news-content\">
+                                ${SafeGetValue(skill, '描述[0]', '暂无描述。')}
+                            </div>
+                        </details>`;
+                }).join('');
+            } else {
+                skillsHtml = emptyIcon;
+            }
+
+            return `
+            <details class="section" open>
+                <summary><i class="fa-solid fa-user summary-icon"></i> 主角 <span class="arrow-toggle">&gt;</span></summary> 
+                <div class="section-content">
+                    ${statsHtml}<hr><h4>仙术/技能</h4>${skillsHtml}
+                </div>
+            </details>`;
+        }
+        
+        function populateHangnang(hangnangData) {
+            const equipmentData = SafeGetValue(hangnangData, '装备', {});
+            const equipmentHtml = `
+                <div class="char-property-grid">
+                    <i class="fa-solid fa-khanda char-icon"></i><span class="char-prop-name">武器</span><span class="char-prop-value">${SafeGetValue(equipmentData, '武器[0]', emptyVal)}</span>
+                    <i class="fa-solid fa-shirt char-icon"></i><span class="char-prop-name">防具</span><span class="char-prop-value">${SafeGetValue(equipmentData, '防具[0]', emptyVal)}</span>
+                    <i class="fa-solid fa-gem char-icon"></i><span class="char-prop-name">饰品</span><span class="char-prop-value">${SafeGetValue(equipmentData, '饰品[0]', emptyVal)}</span>
+                </div>`;
+
+            const backpack = SafeGetValue(hangnangData, '背包[0]', {});
+            const backpackKeys = typeof backpack === 'object' && backpack !== null ? Object.keys(backpack).filter(k => k !== '$meta' && k !== '__description') : [];
+            let backpackHtml = '';
+            if (backpackKeys.length > 0) {
+                backpackHtml = backpackKeys.map(key => {
+                    const item = backpack[key];
+                    if (typeof item !== 'object' || item === null) return '';
+                    return `<div class=\"item-row\">
+                            <span class=\"value-main\">${SafeGetValue(item, '名称[0]', key)}</span>
+                            <span class=\"property-name\">x ${SafeGetValue(item, '数量[0]', 0)}</span>
+                        </div>`;
+                }).join('');
+            } else {
+                backpackHtml = emptyIcon;
+            }
+
+            return `
+            <details class="section">
+                <summary><i class="fa-solid fa-briefcase summary-icon"></i> 行囊 <span class="arrow-toggle">&gt;</span></summary> 
+                <div class="section-content">
+                    <details class="sub-section" open>
+                        <summary>装备<span class="arrow-toggle">&gt;</span></summary>
+                        <div class="sub-section-content">${equipmentHtml}</div>
+                    </details>
+                    <details class="sub-section">
+                        <summary>背包<span class="arrow-toggle">&gt;</span></summary>
+                        <div class="sub-section-content">${backpackHtml}</div>
+                    </details>
+                </div>
+            </details>`;
+        }
+
+        function populateFates(data) {
+            const fates = SafeGetValue(data, '结缘录[0]', {});
+            const fateKeys = typeof fates === 'object' && fates !== null ? Object.keys(fates).filter(k => k !== '$meta' && k !== '__description') : [];
+            let fatesHtml = '';
+            if (fateKeys.length > 0) {
+                fatesHtml = fateKeys.map(key => {
+                    const npc = fates[key]; 
+                    if (typeof npc !== 'object' || npc === null) return '';
+                    const npcName = SafeGetValue(npc, '姓名[0]', key);
+                    const favor = SafeGetValue(npc, '好感度[0]', 0);
+                    const barId = `favor-bar-${key}`; 
+                    
+                    const npcStatsHtml = `
+                        <div class=\"char-property-grid\">
+                            <i class=\"fa-solid fa-address-card char-icon\"></i><span class=\"char-prop-name\">官职</span><span class=\"char-prop-value\">${SafeGetValue(npc, '官职[0]', emptyVal)}</span>
+                            <i class=\"fa-solid fa-cake-candles char-icon\"></i><span class=\"char-prop-name\">年龄</span><span class_=\"char-prop-value\">${SafeGetValue(npc, '年龄[0]', 'N/A')}</span>
+                            <i class=\"fa-solid fa-gavel char-icon\"></i><span class=\"char-prop-name\">武力</span><span class=\"char-prop-value\">${SafeGetValue(npc, '武力[0]', 'N/A')}</span>
+                            <i class=\"fa-solid fa-brain char-icon\"></i><span class=\"char-prop-name\">谋略</span><span class=\"char-prop-value\">${SafeGetValue(npc, '谋略[0]', 'N/A')}</span>
+                            <i class=\"fa-solid fa-heart char-icon\"></i><span class=\"char-prop-name\">魅力</span><span class=\"char-prop-value\">${SafeGetValue(npc, '魅力[0]', 'N/A')}</span>
+                            <i class=\"fa-solid fa-hand-holding-heart char-icon\"></i><span class=\"char-prop-name\">关系</span><span class=\"char-prop-value\">${SafeGetValue(npc, '当前关系[0]', 'N/A')}</span>
+                            <i class=\"fa-solid fa-khanda char-icon\"></i><span class=\"char-prop-name\">武器</span><span class=\"char-prop-value\">${SafeGetValue(npc, '武器[0]', 'N/A')}</span>
+                            <i class=\"fa-solid fa-horse char-icon\"></i><span class=\"char-prop-name\">坐骑</span><span class=\"char-prop-value\">${SafeGetValue(npc, '坐骑[0]', 'N/A')}</span>
+                        </div>
+                        <hr>
+                        <p><span class=\"property-name\">外貌:</span> <span class=\"value-main\">${SafeGetValue(npc, '外貌[0]', 'N/A')}</span></p>
+                        <p><span class=\"property-name\">衣着:</span> <span class=\"value-main\">${SafeGetValue(npc, '衣着[0]', 'N/A')}</span></p>
+                        <hr>
+                        <p style=\"text-align: center;\"><span class=\"property-name\">好感度: ${favor} / 1000</span></p>
+                        <div class=\"char-favor-bar-container\"><div id=\"${barId}\" class=\"char-favor-bar\"></div></div>
+                        `;
+
+                    return `<details class=\"sub-section\">
+                            <summary>${npcName}<span class=\"arrow-toggle\">&gt;</span></summary>
+                            <div class=\"sub-section-content\">${npcStatsHtml}</div>
+                        </details>`;
+                }).join('');
+            } else {
+                fatesHtml = emptyIcon;
+            }
+            
+            setTimeout(() => {
+                if (fateKeys.length > 0) {
+                    fateKeys.forEach(key => {
+                        const npc = fates[key]; 
+                        if (typeof npc !== 'object' || npc === null) return;
+                        const favor = SafeGetValue(npc, '好感度[0]', 0);
+                        daily_updateProgressBar(`favor-bar-${key}`, favor, 1000);
+                    });
+                }
+            }, 0);
+            
+            return `
+            <details class="section">
+                <summary><i class="fa-solid fa-book-open summary-icon"></i> 结缘录 <span class="arrow-toggle">&gt;</span></summary>
+                <div class="section-content">${fatesHtml}</div>
+            </details>`;
+        }
+
+        function populateNews(newsData) {
+            const strangeNews = SafeGetValue(newsData, '奇闻[0]', '暂无奇闻').replace(/\\n/g, '<br>');
+            const currentPlot = SafeGetValue(newsData, '当前剧情[0]', '暂无剧情');
+            
+            const newsHtml = `
+                <details class=\"sub-section\">
+                    <summary><i class=\"fa-solid fa-scroll\" style=\"margin-right: 8px; opacity: 0.7;\"></i>奇闻<span class=\"arrow-toggle\">&gt;</span></summary>
+                    <div class=\"sub-section-content news-content\">
+                        ${strangeNews || emptyIcon}
+                    </div>
+                </details>
+                <details class=\"sub-section\">
+                    <summary><i class=\"fa-solid fa-theater-masks\" style=\"margin-right: 8px; opacity: 0.7;\"></i>当前剧情<span class=\"arrow-toggle\">&gt;</span></summary>
+                    <div class=\"sub-section-content news-content\">
+                        ${currentPlot || emptyIcon}
+                    </div>
+                </details>
+                `;
+            
+            return `
+            <details class="section">
+                <summary><i class="fa-solid fa-newspaper summary-icon"></i> 天下闻 <span class="arrow-toggle">&gt;</span></summary>
+                <div class="section-content">${newsHtml}</div>
+            </details>`;
+        }
+        
+        function populateYongtan(newsData) {
+            const yongtan_raw = SafeGetValue(newsData, '咏叹[0]', '（暂无诗篇）');
+            const yongtan_normalized = yongtan_raw.replace(/\\\\n/g, '\n').replace(/\\n/g, '\n');
+            const lines = yongtan_normalized.split('\n').filter(line => line.trim() !== '');
+
+            let poemHtml = '<div class=\"poem-grid\">';
+            for (let i = 0; i < 8; i += 2) {
+                poemHtml += `<p>${lines[i] || '...'}</p>`;
+                poemHtml += `<p>${lines[i+1] || '...'}</p>`;
+            }
+            poemHtml += '</div>';
+            
+            return `
+            <div class=\"scroll-poem-container\">
+                <h1>宿命诗</h1>
+                ${poemHtml}
+            </div>`;
+        }
+
+        function renderDailyUI(data) {
+            const wrapper = document.getElementById('chessboard-container-wrapper');
+            if (!wrapper) { console.error("[MasterUI] Daily UI wrapper not found!"); return; }
+
+            const factionPath = '主角.势力[0]'; 
+            const faction = SafeGetValue(data, factionPath, '群雄'); 
+            let themeClass = 'theme-imperial'; 
+            if (faction.includes('汉') || faction.toLowerCase().includes('han')) { themeClass = 'theme-draconic'; } 
+            else if (faction.includes('魏') || faction.toLowerCase().includes('wei')) { themeClass = 'theme-abyss'; } 
+            else if (faction.includes('吴') || faction.toLowerCase().includes('wu')) { themeClass = 'theme-elven'; }
+            wrapper.className = `status-container ${themeClass}`;
+            
+            const worldHtml = populateWorldInfo(SafeGetValue(data, '世界', {}));
+            const protagonistHtml = populateProtagonist(SafeGetValue(data, '主角', {}));
+            const hangnangHtml = populateHangnang(SafeGetValue(data, '行囊', {}));
+            const fatesHtml = populateFates(data);
+            const newsData = SafeGetValue(data, '天下闻', {}); 
+            const newsHtml = populateNews(newsData);
+            const poemHtml = populateYongtan(newsData); 
+
+            wrapper.innerHTML = `
+                <div class="scroll-header">
+                    <div class="master-ui-title"><h1>无双志</h1></div>
+                    ${poemHtml} 
+                </div>
+                
+                ${worldHtml} 
+
+                <div id="chessboard-content-body" class="blocks-container">
+                    ${protagonistHtml}
+                    ${hangnangHtml}
+                    ${fatesHtml}
+                    ${newsHtml}
+                </div>
+            `;
+        }
+
+        /* --- [ 战斗 UI 渲染器 已删除 ] --- */
+
+        // --- [ 5. 主渲染路由 ] ---
+        function Master_Render_UI(data) {
+            if (!data || typeof data !== 'object') {
+                console.warn("[MasterUI] Master_Render_UI 收到无效数据。");
+                return;
+            }
+            window.last_stat_data = data; 
+            const uiMode = SafeGetValue(data, 'UI状态.当前界面[0]', '日常');
+            
+            // 只切换日常UI的显示
+            setToggle('chessboard-container-wrapper', uiMode === '日常');
+
+            if (uiMode === '日常') {
+                renderDailyUI(data); 
+            } 
+            /* '战斗' 模式无操作 */
+        }
+
+        // --- [ 6. MASTER INITIALIZATION ] ---
+        async function Master_Init() {
+            console.log("--- [天下为棋 Master UI v18.3] Master_Init 启动 ---");
+            try {
+                const hasChat = typeof getChatMessages === 'function' && typeof getCurrentMessageId === 'function';
+                const msgs = hasChat ? await getChatMessages(getCurrentMessageId()) : []; 
+                const data = msgs?.[0]?.data?.stat_data; 
+                
+                let mergedData;
+                if (data && typeof data === 'object') {
+                    console.log("[MasterUI] 发现 stat_data。与默认值合并。");
+                    mergedData = deepMerge(defaultMasterEmptyState, data); 
+                } else {
+                    console.warn('[MasterUI] 未发现 stat_data。使用默认空状态。');
+                    mergedData = defaultMasterEmptyState;
+                }
+                
+                Master_Render_UI(mergedData);
+                console.log("--- [MasterUI] Master_Init 完成 ---");
+                
+                /* 战斗点击事件监听器 已删除 */
+
+            } catch (e) {
+                console.error('CRITICAL Error during [MasterUI] Master_Init:', e);
+            }
+        }
+        
+        // --- [ 7. MASTER EVENT LISTENER ] ---
+        if (typeof waitGlobalInitialized === 'function') {
+            console.log("[MasterUI] 等待 Mvu 初始化...");
+            waitGlobalInitialized('Mvu').then(() => {
+                console.log("[MasterUI] Mvu 已初始化. 调用 Master_Init 并设置 *唯一* 监听器。");
+                Master_Init(); 
+                eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, m => {
+                    if (m && m.stat_data && typeof m.stat_data === 'object') {
+                        Master_Render_UI(m.stat_data); 
+                    } else {
+                        console.warn('[MasterUI] S_ENDED 事件，但 stat_data 无效。');
+                    }
+                });
+            }).catch(error => {
+                console.error('[MasterUI] 等待 Mvu 初始化时出错:', error);
+                document.addEventListener('DOMContentLoaded', Master_Init);
+            });
+        } else {
+            console.warn('[MasterUI] waitGlobalInitialized 未找到。在 DOMContentLoaded 上加载。');
+            document.addEventListener('DOMContentLoaded', Master_Init);
+        }
+    })();
+</script>
